@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+
+	"github.com/dimitrijed93/dgtc/pkg/utils"
 )
 
-/** Container for Peer indentity
-Usual Peer ports: 6881-6889 TCP
-Peers are registered on the Tracker
-*/
 type Peer struct {
 	IP   net.IP
 	Port uint16
@@ -21,10 +19,8 @@ func (p Peer) String() string {
 }
 
 func Unmarshal(peersBin []byte) ([]Peer, error) {
-	// 2 bytes for port, 4 bytes for IP
-	const peerSize = 6
 
-	numPeers := len(peersBin) / peerSize
+	numPeers := len(peersBin) / utils.PEER_SIZE
 
 	if len(peersBin)%numPeers != 0 {
 		err := fmt.Errorf("Received malformed peers")
@@ -34,7 +30,7 @@ func Unmarshal(peersBin []byte) ([]Peer, error) {
 	peers := make([]Peer, numPeers)
 
 	for i := 0; i < numPeers; i++ {
-		offset := i * peerSize
+		offset := i * utils.PEER_SIZE
 
 		peers[i].IP = net.IP(peersBin[offset : offset+4])
 		peers[i].Port = binary.BigEndian.Uint16(peersBin[offset+4 : offset+6])

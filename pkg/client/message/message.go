@@ -42,6 +42,24 @@ func NewMessageRequest(index int, begin int, len int) *Message {
 	return &Message{MessageID: MESSAGE_REQUEST, Payload: payload}
 }
 
+func NewMessageInterested() *Message {
+	return &Message{
+		MessageID: MESSAGE_INTERESTED,
+	}
+}
+
+func NewMessageNotInterested() *Message {
+	return &Message{
+		MessageID: MESSAGE_NOT_INTERESTED,
+	}
+}
+
+func NewMessageUnchoke() *Message {
+	return &Message{
+		MessageID: MESSAGE_UNCHOKE,
+	}
+}
+
 // Create a message MESSAGE_HAVE to declare to the peers
 // that client has a block of data
 func NewMessageHave(index int) *Message {

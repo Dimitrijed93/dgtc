@@ -7,5 +7,6 @@ const (
 	PROTOCOL            = "tcp"
 	BITFIELD_LEN        = 8
 	INFO_HASH_LEN       = 20
+	PEER_SIZE           = 6 // 4 for host, 2 for port
 	CONNECTION_DEADLINE = time.Second * 5
 )

@@ -13,7 +13,7 @@ type Handshake struct {
 	PeerID   [20]byte // Peer identity
 }
 
-func (h *Handshake) NewHandshake(infoHash [20]byte, peerID [20]byte) *Handshake {
+func NewHandshake(infoHash [20]byte, peerID [20]byte) *Handshake {
 	return &Handshake{
 		Pstr:     "BitTorrent protocol",
 		InfoHash: infoHash,
@@ -21,13 +21,12 @@ func (h *Handshake) NewHandshake(infoHash [20]byte, peerID [20]byte) *Handshake 
 	}
 }
 
-/** Serialize Handshake constisting of :
-Length of the protocol
-Protocol
-Optional Bitfields (8 bytes)
-InfoHash of the file we want to download
-PeerId
-*/
+// Serialize Hanshake
+// 1. Length of the protocol,
+// 2. Protocol
+// 3. Optional Bitfields
+// 4. InfoHash
+// 5. PeerId
 func (h *Handshake) Serialize() []byte {
 	pstrlen := len(h.Pstr)
 	bufLen := 49 + pstrlen
