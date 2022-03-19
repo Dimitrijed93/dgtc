@@ -6,7 +6,7 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/dimitrijed93/dgtc/pkg/utils"
+	"github.com/dimitrijed93/dgtc/internal/utils"
 )
 
 type Peer struct {

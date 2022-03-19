@@ -5,18 +5,18 @@ import (
 	"crypto/sha1"
 	"fmt"
 
-	"github.com/dimitrijed93/dgtc/pkg/utils"
+	"github.com/dimitrijed93/dgtc/internal/utils"
 	"github.com/jackpal/bencode-go"
 )
 
-type BencodeInfo struct {
-	Pieces       string `bencode:"pieces"`
-	PiecesLength int    `bencode:"pieces"`
-	Length       int    `bencode:"length"`
-	Name         string `bencode:"name"`
+type TorrentInfo struct {
+	Pieces      string `bencode:"pieces"`
+	PieceLength int    `bencode:"piece length"`
+	Length      int    `bencode:"length"`
+	Name        string `bencode:"name"`
 }
 
-func (b *BencodeInfo) hash() ([20]byte, error) {
+func (b *TorrentInfo) hash() ([20]byte, error) {
 	var buff bytes.Buffer
 
 	err := bencode.Marshal(&buff, *b)
@@ -28,7 +28,7 @@ func (b *BencodeInfo) hash() ([20]byte, error) {
 	return hash, nil
 }
 
-func (b *BencodeInfo) splitHashes() ([][20]byte, error) {
+func (b *TorrentInfo) splitHashes() ([][20]byte, error) {
 	buf := []byte(b.Pieces)
 	if len(buf)%utils.INFO_HASH_LEN != 0 {
 		return nil, fmt.Errorf("Malformed pieces of lenght %d", len(buf))

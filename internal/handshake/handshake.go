@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/dimitrijed93/dgtc/pkg/utils"
+	"github.com/dimitrijed93/dgtc/internal/utils"
 )
 
 type Handshake struct {

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dimitrijed93/dgtc/pkg/client/peer"
-	"github.com/dimitrijed93/dgtc/pkg/utils"
+	"github.com/dimitrijed93/dgtc/internal/peer"
+	"github.com/dimitrijed93/dgtc/internal/utils"
 	"github.com/jackpal/bencode-go"
 )
 
@@ -25,7 +25,9 @@ type trackerResponse struct {
 	Peers    string `bencode:"peers"`
 }
 
-func NewTorrentFile(bto BencodeTorrent) (TorrentFile, error) {
+func NewTorrentFile(path string) (TorrentFile, error) {
+
+	bto, err := ParseMetaInfo(path)
 	infohash, err := bto.Info.hash()
 	if err != nil {
 		return TorrentFile{}, err
@@ -40,7 +42,7 @@ func NewTorrentFile(bto BencodeTorrent) (TorrentFile, error) {
 		Announce:    bto.Announce,
 		InfoHash:    infohash,
 		PieceHashes: pieceHashes,
-		PieceLength: bto.Info.PiecesLength,
+		PieceLength: bto.Info.PieceLength,
 		Length:      bto.Info.Length,
 		Name:        bto.Info.Name,
 	}
@@ -61,6 +63,7 @@ func (t *TorrentFile) buildTrackerUrl(peerID [20]byte, port uint16) (string, err
 		"info_hash": []string{string(t.InfoHash[:])},
 		// Name of the client. Used to be identified
 		// by other peers
+		"port":       []string{strconv.Itoa(int(port))},
 		"peer_id":    []string{string(peerID[:])},
 		"uploaded":   []string{"0"},
 		"downloaded": []string{"0"},
@@ -72,8 +75,9 @@ func (t *TorrentFile) buildTrackerUrl(peerID [20]byte, port uint16) (string, err
 	return base.String(), nil
 }
 
-func (t *TorrentFile) requestPeers(peerId [20]byte, port uint16) ([]peer.Peer, error) {
-	url, err := t.buildTrackerUrl(peerId, port)
+func (t *TorrentFile) RequestPeers(peerId [20]byte) ([]peer.Peer, error) {
+
+	url, err := t.buildTrackerUrl(peerId, utils.PORT)
 
 	if err != nil {
 		return nil, err

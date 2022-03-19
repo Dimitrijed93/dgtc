@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/dimitrijed93/dgtc/pkg/client/message"
+	"github.com/dimitrijed93/dgtc/internal/message"
 )
 
 type Bitfield []byte

@@ -6,10 +6,10 @@ import (
 	"net"
 	"time"
 
-	"github.com/dimitrijed93/dgtc/pkg/client/handshake"
-	"github.com/dimitrijed93/dgtc/pkg/client/message"
-	"github.com/dimitrijed93/dgtc/pkg/client/peer"
-	"github.com/dimitrijed93/dgtc/pkg/utils"
+	"github.com/dimitrijed93/dgtc/internal/handshake"
+	"github.com/dimitrijed93/dgtc/internal/message"
+	"github.com/dimitrijed93/dgtc/internal/peer"
+	"github.com/dimitrijed93/dgtc/internal/utils"
 )
 
 // Wrapper for TCP connection with Peer
@@ -77,6 +77,11 @@ func completeHandshake(conn net.Conn, infohash, peerId [20]byte) error {
 
 }
 
+func (c *Client) Read() (*message.Message, error) {
+	msg, err := message.Read(c.Conn)
+	return msg, err
+}
+
 func (c *Client) SendRequest(index, begin, length int) error {
 	req := message.NewMessageRequest(index, begin, length)
 	_, err := c.Conn.Write(req.Serialize())
@@ -84,7 +89,7 @@ func (c *Client) SendRequest(index, begin, length int) error {
 	return err
 }
 
-func (c *Client) sendInterested() error {
+func (c *Client) SendInterested() error {
 	req := message.NewMessageInterested()
 	_, err := c.Conn.Write(req.Serialize())
 	return err
