@@ -8,6 +8,10 @@ import (
 	"github.com/dimitrijed93/dgtc/internal/message"
 )
 
+// Bitfield indicates what pieces the peer has
+//
+// Present pieces are indicated by 1.
+// Missing pieces are indicates by 0.
 type Bitfield []byte
 
 func (b Bitfield) HasPiece(index int) bool {
@@ -23,7 +27,7 @@ func (b Bitfield) SetPiece(index int) {
 }
 
 func ReceiveBitField(conn net.Conn) (Bitfield, error) {
-	conn.SetDeadline(time.Now().Add(CONNECTION_DEADLINE)) // Add Timeout
+	conn.SetDeadline(time.Now().Add(CONNECTION_DEADLINE))
 	defer conn.SetDeadline(time.Time{})
 
 	msg, err := message.Read(conn)
@@ -32,7 +36,6 @@ func ReceiveBitField(conn net.Conn) (Bitfield, error) {
 		return nil, err
 	}
 
-	// Accept only bitfield messages
 	if msg.MessageID != message.MESSAGE_BITFIELD {
 		err := fmt.Errorf("Expected bitfield but got ID %d", msg.MessageID)
 		return nil, err

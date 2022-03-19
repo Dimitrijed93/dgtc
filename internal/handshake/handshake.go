@@ -7,10 +7,17 @@ import (
 	"github.com/dimitrijed93/dgtc/internal/utils"
 )
 
+// Handshake with the peer
+//
+// Pstr - Type of Protocol
+//
+// InfoHash - Hash of the file
+//
+// PeerID - Peer identity
 type Handshake struct {
-	Pstr     string   // Type of Protocol
-	InfoHash [20]byte // Hash of the file
-	PeerID   [20]byte // Peer identity
+	Pstr     string
+	InfoHash [20]byte
+	PeerID   [20]byte
 }
 
 func NewHandshake(infoHash [20]byte, peerID [20]byte) *Handshake {

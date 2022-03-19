@@ -26,7 +26,8 @@ type Message struct {
 	Payload   []byte
 }
 
-// Create message to request a block (part of the piece) from a peer
+// Create message to request a block (part of the piece) from a peer.
+//
 // To request a block a client needs to send MESSAGE_INTERESTED
 // Message and to be UNCHOKED by the peer
 func NewMessageRequest(index int, begin int, len int) *Message {

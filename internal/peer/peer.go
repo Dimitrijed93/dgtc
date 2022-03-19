@@ -2,7 +2,7 @@ package peer
 
 import (
 	"encoding/binary"
-	"fmt"
+	"log"
 	"net"
 	"strconv"
 
@@ -20,22 +20,32 @@ func (p Peer) String() string {
 
 func Unmarshal(peersBin []byte) ([]Peer, error) {
 
-	numPeers := len(peersBin) / utils.PEER_SIZE
-
-	if len(peersBin)%numPeers != 0 {
-		err := fmt.Errorf("Received malformed peers")
-		return nil, err
-	}
+	numPeers := validatePeersBin(peersBin)
 
 	peers := make([]Peer, numPeers)
 
 	for i := 0; i < numPeers; i++ {
 		offset := i * utils.PEER_SIZE
-
+		// 4 for host, 2 for port
 		peers[i].IP = net.IP(peersBin[offset : offset+4])
 		peers[i].Port = binary.BigEndian.Uint16(peersBin[offset+4 : offset+6])
 
 	}
 
 	return peers, nil
+}
+
+func validatePeersBin(peersBin []byte) int {
+
+	if utils.IsEmpty(peersBin) {
+		log.Fatal("There are no peers present")
+	}
+
+	numPeers := len(peersBin) / utils.PEER_SIZE
+
+	if len(peersBin)%numPeers != 0 {
+		log.Fatal("Received malformed peers")
+	}
+
+	return numPeers
 }
