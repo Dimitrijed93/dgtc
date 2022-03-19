@@ -6,6 +6,7 @@ import (
 
 	"github.com/dimitrijed93/dgtc/internal/downloader"
 	"github.com/dimitrijed93/dgtc/internal/files"
+	"github.com/dimitrijed93/dgtc/internal/utils"
 )
 
 type Dgtc struct {
@@ -15,7 +16,7 @@ type Dgtc struct {
 }
 
 func NewDgtc(in string, out string) *Dgtc {
-	var peerId [20]byte
+	var peerId [utils.PEER_ID_LEN]byte
 	_, err := rand.Read(peerId[:])
 	if err != nil {
 		panic("Error generating peerdId")
@@ -38,7 +39,7 @@ func (d *Dgtc) Start() {
 
 	dw, err := downloader.NewDownloader(tf, peers, d.PeerId)
 
-	dw.Init(d.In)
+	dw.Start(d.Out)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
-	"github.com/dimitrijed93/dgtc/internal/utils"
 	"github.com/dimitrijed93/dgtc/pkg/dgtc"
 )
 
@@ -21,13 +20,7 @@ func main() {
 }
 
 func validateArgs() {
-	if os.Args == nil {
-		fmt.Errorf("Params for In path and out path are required!")
-	}
-}
-
-func validatePath(inPath string, outPath string) {
-	if inPath == utils.EMPTY_STRING || outPath == utils.EMPTY_STRING {
-		fmt.Errorf("In path and out path are required!")
+	if len(os.Args) != 3 {
+		log.Fatal("Invalid args. Input file and output directory are required")
 	}
 }

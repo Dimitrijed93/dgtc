@@ -59,7 +59,7 @@ func NewDownloader(t files.TorrentFile, peers []peer.Peer, peerId [20]byte) (*Do
 	return downloader, nil
 }
 
-func (d *Downloader) Init(path string) error {
+func (d *Downloader) Start(path string) error {
 
 	buf, err := d.Download()
 	if err != nil {
@@ -78,11 +78,7 @@ func (d *Downloader) Init(path string) error {
 	return nil
 }
 
-func (d *Downloader) Download() ([]byte, error) {
-	log.Println("Starting to download torrent file", d.T.Name)
-
-	queue := make(chan *PieceJob, len(d.T.PieceHashes))
-	results := make(chan *PieceResult)
+func (d *Downloader) setupJobs(queue chan *PieceJob, results chan *PieceResult) {
 
 	for index, hash := range d.T.PieceHashes {
 		length := d.calculatePieceHashes(index)
@@ -92,6 +88,14 @@ func (d *Downloader) Download() ([]byte, error) {
 			length,
 		}
 	}
+}
+func (d *Downloader) Download() ([]byte, error) {
+	log.Println("Starting to download torrent file", d.T.Name)
+
+	queue := make(chan *PieceJob, len(d.T.PieceHashes))
+	results := make(chan *PieceResult)
+
+	d.setupJobs(queue, results)
 
 	for _, peer := range d.Peers {
 		go d.startDownloadJob(peer, queue, results)

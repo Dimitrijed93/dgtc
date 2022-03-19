@@ -108,7 +108,7 @@ func ParseMessagePiece(index int, buf []byte, msg *Message) (int, error) {
 
 	data := msg.Payload[8:]
 
-	if begin+len(data) >= len(buf) {
+	if begin+len(data) > len(buf) {
 		return 0, fmt.Errorf("Data too long [%d] for offset %d with length %d", len(data), begin, len(buf))
 	}
 
