@@ -66,16 +66,20 @@ func (d *Downloader) Start(path string) error {
 		return err
 	}
 
+	writeToOutFile(path, buf)
+	return nil
+}
+
+func writeToOutFile(path string, buf []byte) {
 	outFile, err := os.Create(path)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	defer outFile.Close()
 	_, err = outFile.Write(buf)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	return nil
 }
 
 func (d *Downloader) setupJobs(queue chan *PieceJob, results chan *PieceResult) {
@@ -89,6 +93,7 @@ func (d *Downloader) setupJobs(queue chan *PieceJob, results chan *PieceResult) 
 		}
 	}
 }
+
 func (d *Downloader) Download() ([]byte, error) {
 	log.Println("Starting to download torrent file", d.T.Name)
 
@@ -101,6 +106,13 @@ func (d *Downloader) Download() ([]byte, error) {
 		go d.startDownloadJob(peer, queue, results)
 	}
 
+	buf := d.showProgress(results)
+
+	close(queue)
+	return buf, nil
+}
+
+func (d *Downloader) showProgress(results chan *PieceResult) []byte {
 	buf := make([]byte, d.T.Length)
 	done := 0
 	for done < len(d.T.PieceHashes) {
@@ -112,12 +124,8 @@ func (d *Downloader) Download() ([]byte, error) {
 		numOfWorkers := runtime.NumGoroutine() - 1
 
 		log.Printf("(%0.2f%%) Downloaded piece #%d from %d peers\n", percent, res.index, numOfWorkers)
-
 	}
-
-	close(queue)
-	return buf, nil
-
+	return buf
 }
 
 func (d *Downloader) calculatePieceHashes(index int) int {

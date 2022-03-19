@@ -6,16 +6,18 @@ import (
 
 	"github.com/dimitrijed93/dgtc/internal/downloader"
 	"github.com/dimitrijed93/dgtc/internal/files"
+	"github.com/dimitrijed93/dgtc/internal/tracker"
 	"github.com/dimitrijed93/dgtc/internal/utils"
 )
 
 type Dgtc struct {
 	In     string
 	Out    string
+	Type   string
 	PeerId [20]byte
 }
 
-func NewDgtc(in string, out string) *Dgtc {
+func NewDgtc(in string, out string, trackerType string) *Dgtc {
 	var peerId [utils.PEER_ID_LEN]byte
 	_, err := rand.Read(peerId[:])
 	if err != nil {
@@ -25,13 +27,17 @@ func NewDgtc(in string, out string) *Dgtc {
 	return &Dgtc{
 		In:     in,
 		Out:    out,
+		Type:   trackerType,
 		PeerId: peerId,
 	}
 }
 
 func (d *Dgtc) Start() {
 	tf, err := files.NewTorrentFile(d.In)
-	peers, err := tf.RequestPeers(d.PeerId)
+
+	tracker := d.determineTracker(tf)
+
+	peers, err := tracker.RequestPeers(d.PeerId)
 
 	if err != nil {
 		log.Fatal(err)
@@ -43,4 +49,13 @@ func (d *Dgtc) Start() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (d Dgtc) determineTracker(tf files.TorrentFile) tracker.Tracker {
+	if d.Type == tracker.HTTP {
+		return &tracker.HttpTracker{
+			Tf: tf,
+		}
+	}
+	return nil
 }
