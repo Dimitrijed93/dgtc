@@ -52,7 +52,12 @@ func (d *Dgtc) Start() {
 }
 
 func (d Dgtc) determineTracker(tf files.TorrentFile) tracker.Tracker {
-	if d.Type == tracker.HTTP {
+	switch d.Type {
+	case tracker.HTTP:
+		return &tracker.HttpTracker{
+			Tf: tf,
+		}
+	case tracker.UDP:
 		return &tracker.HttpTracker{
 			Tf: tf,
 		}

@@ -45,7 +45,7 @@ type PieceProgress struct {
 type Downloader struct {
 	Peers  []peer.Peer
 	PeerId [20]byte
-	T      files.TorrentFile
+	Tf     files.TorrentFile
 }
 
 func NewDownloader(t files.TorrentFile, peers []peer.Peer, peerId [20]byte) (*Downloader, error) {
@@ -53,7 +53,7 @@ func NewDownloader(t files.TorrentFile, peers []peer.Peer, peerId [20]byte) (*Do
 	downloader := &Downloader{
 		Peers:  peers,
 		PeerId: peerId,
-		T:      t,
+		Tf:     t,
 	}
 
 	return downloader, nil
@@ -66,12 +66,13 @@ func (d *Downloader) Start(path string) error {
 		return err
 	}
 
-	writeToOutFile(path, buf)
+	d.writeToOutFile(path, buf)
 	return nil
 }
 
-func writeToOutFile(path string, buf []byte) {
-	outFile, err := os.Create(path)
+func (d Downloader) writeToOutFile(path string, buf []byte) {
+	filePath := path + "/" + d.Tf.Name
+	outFile, err := os.Create(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -84,7 +85,7 @@ func writeToOutFile(path string, buf []byte) {
 
 func (d *Downloader) setupJobs(queue chan *PieceJob, results chan *PieceResult) {
 
-	for index, hash := range d.T.PieceHashes {
+	for index, hash := range d.Tf.PieceHashes {
 		length := d.calculatePieceHashes(index)
 		queue <- &PieceJob{
 			index,
@@ -95,9 +96,9 @@ func (d *Downloader) setupJobs(queue chan *PieceJob, results chan *PieceResult) 
 }
 
 func (d *Downloader) Download() ([]byte, error) {
-	log.Println("Starting to download torrent file", d.T.Name)
+	log.Println("Starting to download torrent file", d.Tf.Name)
 
-	queue := make(chan *PieceJob, len(d.T.PieceHashes))
+	queue := make(chan *PieceJob, len(d.Tf.PieceHashes))
 	results := make(chan *PieceResult)
 
 	d.setupJobs(queue, results)
@@ -113,14 +114,14 @@ func (d *Downloader) Download() ([]byte, error) {
 }
 
 func (d *Downloader) showProgress(results chan *PieceResult) []byte {
-	buf := make([]byte, d.T.Length)
+	buf := make([]byte, d.Tf.Length)
 	done := 0
-	for done < len(d.T.PieceHashes) {
+	for done < len(d.Tf.PieceHashes) {
 		res := <-results
 		begin, end := d.calculateBoundsForPiece(res.index)
 		copy(buf[begin:end], res.buf)
 		done++
-		percent := float64(done) / float64(len(d.T.PieceHashes)) * 100
+		percent := float64(done) / float64(len(d.Tf.PieceHashes)) * 100
 		numOfWorkers := runtime.NumGoroutine() - 1
 
 		log.Printf("(%0.2f%%) Downloaded piece #%d from %d peers\n", percent, res.index, numOfWorkers)
@@ -134,16 +135,16 @@ func (d *Downloader) calculatePieceHashes(index int) int {
 }
 
 func (d *Downloader) calculateBoundsForPiece(index int) (int, int) {
-	begin := index * d.T.PieceLength
-	end := begin + d.T.PieceLength
-	if end > d.T.Length {
-		end = d.T.Length
+	begin := index * d.Tf.PieceLength
+	end := begin + d.Tf.PieceLength
+	if end > d.Tf.Length {
+		end = d.Tf.Length
 	}
 	return begin, end
 }
 
 func (d *Downloader) startDownloadJob(peer peer.Peer, queue chan *PieceJob, results chan *PieceResult) {
-	client, err := client.New(peer, d.PeerId, d.T.InfoHash)
+	client, err := client.New(peer, d.PeerId, d.Tf.InfoHash)
 	if err != nil {
 		log.Printf("Fail to handshake with peer %s.", peer.IP)
 		return
