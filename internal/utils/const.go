@@ -4,7 +4,9 @@ import "time"
 
 const (
 	EMPTY_STRING        = ""
-	PROTOCOL            = "tcp"
+	PROTOCOL_TCP        = "tcp"
+	PROTOCOL_UDP        = "udp"
+	PROTOCOL_ID         = 0x41727101980
 	BITFIELD_LEN        = 8
 	INFO_HASH_LEN       = 20
 	PEER_ID_LEN         = 20

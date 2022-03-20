@@ -23,7 +23,7 @@ type Client struct {
 }
 
 func New(peer peer.Peer, peerId, infohash [20]byte) (*Client, error) {
-	conn, err := net.DialTimeout(utils.PROTOCOL, peer.String(), utils.CONNECTION_DEADLINE)
+	conn, err := net.DialTimeout(utils.PROTOCOL_TCP, peer.String(), utils.CONNECTION_DEADLINE)
 	if err != nil {
 		return nil, err
 	}

@@ -58,9 +58,9 @@ func (d Dgtc) determineTracker(tf files.TorrentFile) tracker.Tracker {
 			Tf: tf,
 		}
 	case tracker.UDP:
-		return &tracker.HttpTracker{
-			Tf: tf,
-		}
+		return tracker.NewUdpTracker(
+			tf,
+		)
 	}
 	return nil
 }

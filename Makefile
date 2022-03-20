@@ -4,10 +4,10 @@ build:
 	go build -o cmd/main
 
 execute:
-	./cmd/main ~/torrent/in/debian.iso.torrent  ~/torrent/out http
+	./cmd/main ~/torrent/in/spider.torrent  ~/torrent/out udp
 
 dlv:
-	dlv debug ./main.go --  ~/torrent/in/debian.iso.torrent ~/torrent/out http
+	dlv debug ./main.go --  ~/torrent/in/sabaton.torrent ~/torrent/out udp
 
 run: build execute
 

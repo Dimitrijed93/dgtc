@@ -16,10 +16,10 @@ type HttpTracker struct {
 	Tf files.TorrentFile
 }
 
-func (tracker *HttpTracker) buildTrackerUrl(peerID [20]byte, port uint16) (string, error) {
+func (tracker *HttpTracker) buildTrackerUrl(peerID [20]byte, port uint16) (*url.URL, error) {
 	base, err := url.Parse(tracker.Tf.Announce)
 	if err != nil {
-		return utils.EMPTY_STRING, err
+		return &url.URL{}, err
 	}
 
 	params := url.Values{
@@ -37,7 +37,7 @@ func (tracker *HttpTracker) buildTrackerUrl(peerID [20]byte, port uint16) (strin
 	}
 
 	base.RawQuery = params.Encode()
-	return base.String(), nil
+	return base, nil
 }
 
 func (tracker *HttpTracker) RequestPeers(peerId [20]byte) ([]peer.Peer, error) {
@@ -50,7 +50,7 @@ func (tracker *HttpTracker) RequestPeers(peerId [20]byte) ([]peer.Peer, error) {
 
 	c := &http.Client{Timeout: 15 * time.Second}
 
-	res, err := c.Get(url)
+	res, err := c.Get(url.String())
 
 	if err != nil {
 		return nil, err
