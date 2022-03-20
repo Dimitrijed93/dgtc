@@ -1,14 +1,17 @@
-.PHONY : build run start execute debug dlv
+.PHONY : clean build run start execute debug dlv
+
+clean:
+	rm -r cmd/main
 
 build:
 	go build -o cmd/main
 
 execute:
-	./cmd/main ~/torrent/in/spider.torrent  ~/torrent/out udp
+	./cmd/main ~/torrent/in/spider.torrent  ~/torrent/out
 
 dlv:
-	dlv debug ./main.go --  ~/torrent/in/sabaton.torrent ~/torrent/out udp
+	dlv debug ./main.go --  ~/torrent/in/debian.iso.torrent ~/torrent/out
 
-run: build execute
+run: clean build execute
 
-debug: build dlv
+debug: clean build dlv

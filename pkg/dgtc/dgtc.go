@@ -17,7 +17,7 @@ type Dgtc struct {
 	PeerId [20]byte
 }
 
-func NewDgtc(in string, out string, trackerType string) *Dgtc {
+func NewDgtc(in string, out string) *Dgtc {
 	var peerId [utils.PEER_ID_LEN]byte
 	_, err := rand.Read(peerId[:])
 	if err != nil {
@@ -27,7 +27,6 @@ func NewDgtc(in string, out string, trackerType string) *Dgtc {
 	return &Dgtc{
 		In:     in,
 		Out:    out,
-		Type:   trackerType,
 		PeerId: peerId,
 	}
 }
@@ -52,15 +51,13 @@ func (d *Dgtc) Start() {
 }
 
 func (d Dgtc) determineTracker(tf files.TorrentFile) tracker.Tracker {
-	switch d.Type {
-	case tracker.HTTP:
+	if tf.IsHTTP {
 		return &tracker.HttpTracker{
 			Tf: tf,
 		}
-	case tracker.UDP:
+	} else {
 		return tracker.NewUdpTracker(
 			tf,
 		)
 	}
-	return nil
 }

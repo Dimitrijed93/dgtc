@@ -1,5 +1,7 @@
 package files
 
+import "strings"
+
 type TorrentFile struct {
 	Announce    string
 	InfoHash    [20]byte
@@ -7,6 +9,7 @@ type TorrentFile struct {
 	PieceLength int
 	Length      int
 	Name        string
+	IsHTTP      bool
 }
 
 func NewTorrentFile(path string) (TorrentFile, error) {
@@ -29,6 +32,7 @@ func NewTorrentFile(path string) (TorrentFile, error) {
 		PieceLength: bto.Info.PieceLength,
 		Length:      bto.Info.Length,
 		Name:        bto.Info.Name,
+		IsHTTP:      strings.Contains(bto.Announce, "http"),
 	}
 
 	return t, nil
